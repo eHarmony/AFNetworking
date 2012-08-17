@@ -1,0 +1,8 @@
+build/*
+target/*
+AFNetworking.xcodeproj/xcuserdata
+AFNetworking.xcodeproj/project.xcworkspace/xcuserdata
+AFNetworking.xcworkspace/xcuserdata
+xcschememanagement.plist
+Example/AFNetworking\ iOS\ Example.xcodeproj/xcuserdata
+Example/AFNetworking\ Mac\ Example.xcodeproj/xcuserdata
