@@ -27,7 +27,7 @@ NSSet * AFContentTypesFromHTTPHeader(NSString *string) {
     static NSCharacterSet *_skippedCharacterSet = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _skippedCharacterSet = [[NSCharacterSet characterSetWithCharactersInString:@" ,"] retain];
+        _skippedCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@" ,"];
     });
     
     if (!string) {
@@ -92,9 +92,9 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
 #pragma mark -
 
 @interface AFHTTPRequestOperation ()
-@property (readwrite, nonatomic, retain) NSURLRequest *request;
-@property (readwrite, nonatomic, retain) NSHTTPURLResponse *response;
-@property (readwrite, nonatomic, retain) NSError *HTTPError;
+@property (readwrite, nonatomic, strong) NSURLRequest *request;
+@property (readwrite, nonatomic, strong) NSHTTPURLResponse *response;
+@property (readwrite, nonatomic, strong) NSError *HTTPError;
 @property (assign) long long totalContentLength;
 @property (assign) long long offsetContentLength;
 @end
@@ -109,7 +109,6 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
 @dynamic response;
 
 - (void)dealloc {
-    [_HTTPError release];
     
     if (_successCallbackQueue) { 
         dispatch_release(_successCallbackQueue);
@@ -121,7 +120,6 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
         _failureCallbackQueue = NULL;
     }
 
-    [super dealloc];
 }
 
 - (NSError *)error {
@@ -132,14 +130,14 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
             [userInfo setValue:self.responseString forKey:NSLocalizedRecoverySuggestionErrorKey];
             [userInfo setValue:[self.request URL] forKey:NSURLErrorFailingURLErrorKey];
             
-            self.HTTPError = [[[NSError alloc] initWithDomain:AFNetworkingErrorDomain code:NSURLErrorBadServerResponse userInfo:userInfo] autorelease];
+            self.HTTPError = [[NSError alloc] initWithDomain:AFNetworkingErrorDomain code:NSURLErrorBadServerResponse userInfo:userInfo];
         } else if ([self.responseData length] > 0 && ![self hasAcceptableContentType]) { // Don't invalidate content type if there is no content
             NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
             [userInfo setValue:[NSString stringWithFormat:NSLocalizedString(@"Expected content type %@, got %@", nil), [[self class] acceptableContentTypes], [self.response MIMEType]] forKey:NSLocalizedDescriptionKey];
             [userInfo setValue:self.responseString forKey:NSLocalizedRecoverySuggestionErrorKey];
             [userInfo setValue:[self.request URL] forKey:NSURLErrorFailingURLErrorKey];
             
-            self.HTTPError = [[[NSError alloc] initWithDomain:AFNetworkingErrorDomain code:NSURLErrorCannotDecodeContentData userInfo:userInfo] autorelease];
+            self.HTTPError = [[NSError alloc] initWithDomain:AFNetworkingErrorDomain code:NSURLErrorCannotDecodeContentData userInfo:userInfo];
         }
     }
     
@@ -158,7 +156,7 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
         offset = [[self.outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey] length];
     }
 
-    NSMutableURLRequest *mutableURLRequest = [[self.request mutableCopy] autorelease];
+    NSMutableURLRequest *mutableURLRequest = [self.request mutableCopy];
     if ([[self.response allHeaderFields] valueForKey:@"ETag"]) {
         [mutableURLRequest setValue:[[self.response allHeaderFields] valueForKey:@"ETag"] forHTTPHeaderField:@"If-Range"];
     }
@@ -207,21 +205,22 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
 - (void)setCompletionBlockWithSuccess:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
                               failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
+    __unsafe_unretained AFHTTPRequestOperation *theSelf = self;
     self.completionBlock = ^ {
-        if ([self isCancelled]) {
+        if ([theSelf isCancelled]) {
             return;
         }
         
-        if (self.error) {
+        if (theSelf.error) {
             if (failure) {
-                dispatch_async(self.failureCallbackQueue ? self.failureCallbackQueue : dispatch_get_main_queue(), ^{
-                    failure(self, self.error);
+                dispatch_async(theSelf.failureCallbackQueue ? theSelf.failureCallbackQueue : dispatch_get_main_queue(), ^{
+                    failure(theSelf, theSelf.error);
                 });
             }
         } else {
             if (success) {
-                dispatch_async(self.successCallbackQueue ? self.successCallbackQueue : dispatch_get_main_queue(), ^{
-                    success(self, self.responseData);
+                dispatch_async(theSelf.successCallbackQueue ? theSelf.successCallbackQueue : dispatch_get_main_queue(), ^{
+                    success(theSelf, theSelf.responseData);
                 });
             }
         }
@@ -239,7 +238,7 @@ static id AFStaticClassValueImplementation(id self, SEL _cmd) {
 }
 
 + (void)addAcceptableStatusCodes:(NSIndexSet *)statusCodes {
-    NSMutableIndexSet *mutableStatusCodes = [[[NSMutableIndexSet alloc] initWithIndexSet:[self acceptableStatusCodes]] autorelease];
+    NSMutableIndexSet *mutableStatusCodes = [[NSMutableIndexSet alloc] initWithIndexSet:[self acceptableStatusCodes]];
     [mutableStatusCodes addIndexes:statusCodes];
 	SEL selector = @selector(acceptableStatusCodes);
 	AFSwizzleClassMethodWithImplementation([self class], selector, (IMP)AFStaticClassValueImplementation);
@@ -251,7 +250,7 @@ static id AFStaticClassValueImplementation(id self, SEL _cmd) {
 }
 
 + (void)addAcceptableContentTypes:(NSSet *)contentTypes {
-    NSMutableSet *mutableContentTypes = [[[NSMutableSet alloc] initWithSet:[self acceptableContentTypes] copyItems:YES] autorelease];
+    NSMutableSet *mutableContentTypes = [[NSMutableSet alloc] initWithSet:[self acceptableContentTypes] copyItems:YES];
     [mutableContentTypes unionSet:contentTypes];
 	SEL selector = @selector(acceptableContentTypes);
 	AFSwizzleClassMethodWithImplementation([self class], selector, (IMP)AFStaticClassValueImplementation);

@@ -40,7 +40,7 @@ extern NSSet * AFContentTypesFromHTTPHeader(NSString *string);
 /**
  The last HTTP response received by the operation's connection.
  */
-@property (readonly, nonatomic, retain) NSHTTPURLResponse *response;
+@property (readonly, nonatomic, strong) NSHTTPURLResponse *response;
 
 ///----------------------------------------------------------
 /// @name Managing And Checking For Acceptable HTTP Responses
