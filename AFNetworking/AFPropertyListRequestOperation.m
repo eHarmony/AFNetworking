@@ -32,9 +32,9 @@ static dispatch_queue_t property_list_request_operation_processing_queue() {
 }
 
 @interface AFPropertyListRequestOperation ()
-@property (readwrite, nonatomic, strong) id responsePropertyList;
+@property (readwrite, nonatomic, retain) id responsePropertyList;
 @property (readwrite, nonatomic, assign) NSPropertyListFormat propertyListFormat;
-@property (readwrite, nonatomic, strong) NSError *propertyListError;
+@property (readwrite, nonatomic, retain) NSError *propertyListError;
 @end
 
 @implementation AFPropertyListRequestOperation
@@ -47,7 +47,7 @@ static dispatch_queue_t property_list_request_operation_processing_queue() {
                                                                     success:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, id propertyList))success
                                                                     failure:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id propertyList))failure
 {
-    AFPropertyListRequestOperation *requestOperation = [[self alloc] initWithRequest:request];
+    AFPropertyListRequestOperation *requestOperation = [[[self alloc] initWithRequest:request] autorelease];
     [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         if (success) {
             success(operation.request, operation.response, responseObject);
@@ -72,6 +72,11 @@ static dispatch_queue_t property_list_request_operation_processing_queue() {
     return self;
 }
 
+- (void)dealloc {
+    [_responsePropertyList release];
+    [_propertyListError release];
+    [super dealloc];
+}
 
 - (id)responsePropertyList {
     if (!_responsePropertyList && [self.responseData length] > 0 && [self isFinished]) {
@@ -106,32 +111,31 @@ static dispatch_queue_t property_list_request_operation_processing_queue() {
 - (void)setCompletionBlockWithSuccess:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
                               failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
-    __unsafe_unretained AFPropertyListRequestOperation *theSelf = self;
     self.completionBlock = ^ {
-        if ([theSelf isCancelled]) {
+        if ([self isCancelled]) {
             return;
         }
         
-        if (theSelf.error) {
+        if (self.error) {
             if (failure) {
-                dispatch_async(theSelf.failureCallbackQueue ? theSelf.failureCallbackQueue : dispatch_get_main_queue(), ^{
-                    failure(theSelf, theSelf.error);
+                dispatch_async(self.failureCallbackQueue ? self.failureCallbackQueue : dispatch_get_main_queue(), ^{
+                    failure(self, self.error);
                 });
             }
         } else {
             dispatch_async(property_list_request_operation_processing_queue(), ^(void) {
-                id propertyList = theSelf.responsePropertyList;
+                id propertyList = self.responsePropertyList;
                 
                 if (self.propertyListError) {
                     if (failure) {
-                        dispatch_async(theSelf.failureCallbackQueue ? theSelf.failureCallbackQueue : dispatch_get_main_queue(), ^{
-                            failure(theSelf, theSelf.error);
+                        dispatch_async(self.failureCallbackQueue ? self.failureCallbackQueue : dispatch_get_main_queue(), ^{
+                            failure(self, self.error);
                         });
                     }
                 } else {
                     if (success) {
-                        dispatch_async(theSelf.successCallbackQueue ? theSelf.successCallbackQueue : dispatch_get_main_queue(), ^{
-                            success(theSelf, propertyList);
+                        dispatch_async(self.successCallbackQueue ? self.successCallbackQueue : dispatch_get_main_queue(), ^{
+                            success(self, propertyList);
                         });
                     } 
                 }

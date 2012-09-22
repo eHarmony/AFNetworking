@@ -27,7 +27,7 @@
 		008B2E0015DB33A000AD54D4 /* AFHTTPRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 008B2DED15DB33A000AD54D4 /* AFHTTPRequestOperation.m */; };
 		008B2E0115DB33A000AD54D4 /* AFImageRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 008B2DEF15DB33A000AD54D4 /* AFImageRequestOperation.m */; };
 		008B2E0215DB33A000AD54D4 /* AFJSONRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 008B2DF115DB33A000AD54D4 /* AFJSONRequestOperation.m */; };
-		008B2E0315DB33A000AD54D4 /* AFJSONUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 008B2DF315DB33A000AD54D4 /* AFJSONUtilities.m */; settings = {COMPILER_FLAGS = ""; }; };
+		008B2E0315DB33A000AD54D4 /* AFJSONUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 008B2DF315DB33A000AD54D4 /* AFJSONUtilities.m */; };
 		008B2E0415DB33A000AD54D4 /* AFNetworkActivityIndicatorManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 008B2DF515DB33A000AD54D4 /* AFNetworkActivityIndicatorManager.m */; };
 		008B2E0515DB33A000AD54D4 /* AFPropertyListRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 008B2DF815DB33A000AD54D4 /* AFPropertyListRequestOperation.m */; };
 		008B2E0615DB33A000AD54D4 /* AFURLConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 008B2DFA15DB33A000AD54D4 /* AFURLConnectionOperation.m */; };
@@ -106,6 +106,7 @@
 		008B2DB415DB332E00AD54D4 = {
 			isa = PBXGroup;
 			children = (
+				00364AF915DD9CEE00B94CD5 /* SystemConfiguration.framework */,
 				008B2DC415DB332E00AD54D4 /* AFNetworking */,
 				008B2DC115DB332E00AD54D4 /* Frameworks */,
 				008B2DC015DB332E00AD54D4 /* Products */,
@@ -127,7 +128,6 @@
 			children = (
 				008B2DC215DB332E00AD54D4 /* Foundation.framework */,
 				008B2DD115DB332E00AD54D4 /* SenTestingKit.framework */,
-				00364AF915DD9CEE00B94CD5 /* SystemConfiguration.framework */,
 				008B2DD315DB332E00AD54D4 /* UIKit.framework */,
 			);
 			name = Frameworks;
@@ -342,7 +342,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_ENABLE_OBJC_ARC = YES;
 				DSTROOT = /tmp/AFNetworking.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AFNetworking/AFNetworking-Prefix.pch";
@@ -358,7 +357,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_ENABLE_OBJC_ARC = YES;
 				DSTROOT = /tmp/AFNetworking.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AFNetworking/AFNetworking-Prefix.pch";

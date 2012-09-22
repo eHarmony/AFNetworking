@@ -33,7 +33,7 @@ static dispatch_queue_t image_request_operation_processing_queue() {
 
 @interface AFImageRequestOperation ()
 #if __IPHONE_OS_VERSION_MIN_REQUIRED
-@property (readwrite, nonatomic, strong) UIImage *responseImage;
+@property (readwrite, nonatomic, retain) UIImage *responseImage;
 #elif __MAC_OS_X_VERSION_MIN_REQUIRED 
 @property (readwrite, nonatomic, retain) NSImage *responseImage;
 #endif
@@ -74,7 +74,7 @@ static dispatch_queue_t image_request_operation_processing_queue() {
                                                       success:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image))success
                                                       failure:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error))failure
 {
-    AFImageRequestOperation *requestOperation = [[AFImageRequestOperation alloc] initWithRequest:urlRequest];
+    AFImageRequestOperation *requestOperation = [[[AFImageRequestOperation alloc] initWithRequest:urlRequest] autorelease];
     [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         if (success) {
             UIImage *image = responseObject;
@@ -144,6 +144,10 @@ static dispatch_queue_t image_request_operation_processing_queue() {
     return self;
 }
 
+- (void)dealloc {
+    [_responseImage release];
+    [super dealloc];
+}
 
 #if __IPHONE_OS_VERSION_MIN_REQUIRED
 - (UIImage *)responseImage {
@@ -201,17 +205,16 @@ static dispatch_queue_t image_request_operation_processing_queue() {
 - (void)setCompletionBlockWithSuccess:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
                               failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
-    __unsafe_unretained AFImageRequestOperation *theSelf = self;
     self.completionBlock = ^ {
-        if ([theSelf isCancelled]) {
+        if ([self isCancelled]) {
             return;
         }
         
         dispatch_async(image_request_operation_processing_queue(), ^(void) {
-            if (theSelf.error) {
+            if (self.error) {
                 if (failure) {
-                    dispatch_async(theSelf.failureCallbackQueue ? theSelf.failureCallbackQueue : dispatch_get_main_queue(), ^{
-                        failure(theSelf, theSelf.error);
+                    dispatch_async(self.failureCallbackQueue ? self.failureCallbackQueue : dispatch_get_main_queue(), ^{
+                        failure(self, self.error);
                     });
                 }
             } else {            
@@ -222,10 +225,10 @@ static dispatch_queue_t image_request_operation_processing_queue() {
                     NSImage *image = nil;
 #endif
 
-                    image = theSelf.responseImage;
+                    image = self.responseImage;
 
-                    dispatch_async(theSelf.successCallbackQueue ? theSelf.successCallbackQueue : dispatch_get_main_queue(), ^{
-                        success(theSelf, image);
+                    dispatch_async(self.successCallbackQueue ? self.successCallbackQueue : dispatch_get_main_queue(), ^{
+                        success(self, image);
                     });
                 }
             }

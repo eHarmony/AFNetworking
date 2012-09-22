@@ -48,7 +48,7 @@
 /**
  An `NSXMLParser` object constructed from the response data.
  */
-@property (readonly, nonatomic, strong) NSXMLParser *responseXMLParser;
+@property (readonly, nonatomic, retain) NSXMLParser *responseXMLParser;
 
 #if __MAC_OS_X_VERSION_MIN_REQUIRED
 /**

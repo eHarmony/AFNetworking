@@ -29,7 +29,7 @@ static NSTimeInterval const kAFNetworkActivityIndicatorInvisibilityDelay = 0.17;
 
 @interface AFNetworkActivityIndicatorManager ()
 @property (readwrite, atomic, assign) NSInteger activityCount;
-@property (readwrite, nonatomic, strong) NSTimer *activityIndicatorVisibilityTimer;
+@property (readwrite, nonatomic, retain) NSTimer *activityIndicatorVisibilityTimer;
 @property (readonly, getter = isNetworkActivityIndicatorVisible) BOOL networkActivityIndicatorVisible;
 
 - (void)updateNetworkActivityIndicatorVisibility;
@@ -68,7 +68,9 @@ static NSTimeInterval const kAFNetworkActivityIndicatorInvisibilityDelay = 0.17;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     [_activityIndicatorVisibilityTimer invalidate];
+    [_activityIndicatorVisibilityTimer release]; _activityIndicatorVisibilityTimer = nil;
     
+    [super dealloc];
 }
 
 - (void)updateNetworkActivityIndicatorVisibilityDelayed {

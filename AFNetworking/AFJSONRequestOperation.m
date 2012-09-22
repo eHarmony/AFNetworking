@@ -33,8 +33,8 @@ static dispatch_queue_t json_request_operation_processing_queue() {
 }
 
 @interface AFJSONRequestOperation ()
-@property (readwrite, nonatomic, strong) id responseJSON;
-@property (readwrite, nonatomic, strong) NSError *JSONError;
+@property (readwrite, nonatomic, retain) id responseJSON;
+@property (readwrite, nonatomic, retain) NSError *JSONError;
 @end
 
 @implementation AFJSONRequestOperation
@@ -45,7 +45,7 @@ static dispatch_queue_t json_request_operation_processing_queue() {
                                                     success:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, id JSON))success 
                                                     failure:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON))failure
 {
-    AFJSONRequestOperation *requestOperation = [[self alloc] initWithRequest:urlRequest];
+    AFJSONRequestOperation *requestOperation = [[[self alloc] initWithRequest:urlRequest] autorelease];
     [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         if (success) {
             success(operation.request, operation.response, responseObject);
@@ -59,6 +59,11 @@ static dispatch_queue_t json_request_operation_processing_queue() {
     return requestOperation;
 }
 
+- (void)dealloc {
+    [_responseJSON release];
+    [_JSONError release];
+    [super dealloc];
+}
 
 - (id)responseJSON {
     if (!_responseJSON && [self.responseData length] > 0 && [self isFinished] && !self.JSONError) {
@@ -97,16 +102,15 @@ static dispatch_queue_t json_request_operation_processing_queue() {
 - (void)setCompletionBlockWithSuccess:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
                               failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
-    __unsafe_unretained AFJSONRequestOperation *theSelf = self;
     self.completionBlock = ^ {
-        if ([theSelf isCancelled]) {
+        if ([self isCancelled]) {
             return;
         }
         
         if (self.error) {
             if (failure) {
-                dispatch_async(theSelf.failureCallbackQueue ? theSelf.failureCallbackQueue : dispatch_get_main_queue(), ^{
-                    failure(theSelf, theSelf.error);
+                dispatch_async(self.failureCallbackQueue ? self.failureCallbackQueue : dispatch_get_main_queue(), ^{
+                    failure(self, self.error);
                 });
             }
         } else {
@@ -115,14 +119,14 @@ static dispatch_queue_t json_request_operation_processing_queue() {
                 
                 if (self.JSONError) {
                     if (failure) {
-                        dispatch_async(theSelf.failureCallbackQueue ? theSelf.failureCallbackQueue : dispatch_get_main_queue(), ^{
-                            failure(theSelf, theSelf.error);
+                        dispatch_async(self.failureCallbackQueue ? self.failureCallbackQueue : dispatch_get_main_queue(), ^{
+                            failure(self, self.error);
                         });
                     }
                 } else {
                     if (success) {
-                        dispatch_async(theSelf.successCallbackQueue ? theSelf.successCallbackQueue : dispatch_get_main_queue(), ^{
-                            success(theSelf, JSON);
+                        dispatch_async(self.successCallbackQueue ? self.successCallbackQueue : dispatch_get_main_queue(), ^{
+                            success(self, JSON);
                         });
                     }                    
                 }
