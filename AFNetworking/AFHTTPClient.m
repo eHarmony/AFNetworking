@@ -93,9 +93,15 @@ static NSString * AFBase64EncodedStringFromString(NSString *string) {
 }
 
 NSString * AFURLEncodedStringFromStringWithEncoding(NSString *string, NSStringEncoding encoding) {
-    static NSString * const kAFLegalCharactersToBeEscaped = @"?!@#$^&%*+=,:;'\"`<>()[]{}/\\|~ ";
+    static NSString * const kAFCharactersToBeEscaped = @"?!@#$^&%*+=,:;'\"`<>()[]{}/\\|~";
+    static NSString * const kAFCharactersToLeaveUnescaped = @" ";
     
-	return [(NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)string, NULL, (CFStringRef)kAFLegalCharactersToBeEscaped, CFStringConvertNSStringEncodingToEncoding(encoding)) autorelease];
+	NSString *escaped = (NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
+                                                                            (CFStringRef)string,
+                                                                            (CFStringRef)kAFCharactersToLeaveUnescaped,
+                                                                            (CFStringRef)kAFCharactersToBeEscaped,
+                                                                            CFStringConvertNSStringEncodingToEncoding(encoding));
+    return [[escaped stringByReplacingOccurrencesOfString:@" " withString:@"+"] autorelease];
 }
 
 #pragma mark -
@@ -185,7 +191,7 @@ NSArray * AFQueryStringComponentsFromKeyAndArrayValue(NSString *key, NSArray *va
     NSMutableArray *mutableQueryStringComponents = [NSMutableArray array];
     
     [value enumerateObjectsUsingBlock:^(id nestedValue, NSUInteger idx, BOOL *stop) {
-        [mutableQueryStringComponents addObjectsFromArray:AFQueryStringComponentsFromKeyAndValue([NSString stringWithFormat:@"%@[]", key], nestedValue)];
+        [mutableQueryStringComponents addObjectsFromArray:AFQueryStringComponentsFromKeyAndValue(key, nestedValue)];
     }];
     
     return mutableQueryStringComponents;
