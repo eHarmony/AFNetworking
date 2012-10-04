@@ -101,7 +101,8 @@ NSString * AFURLEncodedStringFromStringWithEncoding(NSString *string, NSStringEn
                                                                             (CFStringRef)kAFCharactersToLeaveUnescaped,
                                                                             (CFStringRef)kAFCharactersToBeEscaped,
                                                                             CFStringConvertNSStringEncodingToEncoding(encoding));
-    return [[escaped stringByReplacingOccurrencesOfString:@" " withString:@"+"] autorelease];
+    [escaped autorelease];
+    return [escaped stringByReplacingOccurrencesOfString:@" " withString:@"+"];
 }
 
 #pragma mark -
