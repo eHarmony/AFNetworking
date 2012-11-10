@@ -59,6 +59,7 @@
 
 /* Begin PBXFileReference section */
 		00364AF915DD9CEE00B94CD5 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		0044F485164DFA7B00D84CBC /* AFNetworking.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = AFNetworking.podspec; sourceTree = "<group>"; };
 		008B2DBF15DB332E00AD54D4 /* libAFNetworking.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libAFNetworking.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		008B2DC215DB332E00AD54D4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		008B2DC615DB332E00AD54D4 /* AFNetworking-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AFNetworking-Prefix.pch"; sourceTree = "<group>"; };
@@ -112,6 +113,7 @@
 				008B2DC015DB332E00AD54D4 /* Products */,
 				008B2E3215DB39F200AD54D4 /* Rakefile */,
 				008B2E3315DB39F200AD54D4 /* rpom.xml */,
+				0044F485164DFA7B00D84CBC /* AFNetworking.podspec */,
 			);
 			sourceTree = "<group>";
 		};
