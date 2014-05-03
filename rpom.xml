@@ -1,7 +1,7 @@
 <project>
 	<name>AFNetworking library</name>
 	<groupId>com.eharmony.mobile.external</groupId>
-	<version>1.0.220</version>
+	<version>1.0.221</version>
 	<scm>git</scm>
 	
 	<artifacts>
